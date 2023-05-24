@@ -1,11 +1,11 @@
-import { galleryItems } from './gallery-items.js';
+import { galleryItems } from "./gallery-items.js";
 // Change code below this line
 
-console.log(galleryItems);
+const galleryMenuEl = document.querySelector(".gallery");
 
-const galleryMenuEl = document.querySelector('.gallery');
-
-const imagesEl = galleryItems.map(({ preview, original, description }) => `<li class="gallery__item">
+const imagesEl = galleryItems
+  .map(
+    ({ preview, original, description }) => `<li class="gallery__item">
   <a class="gallery__link" href="large-image.jpg">
     <img
       class="gallery__image"
@@ -14,27 +14,37 @@ const imagesEl = galleryItems.map(({ preview, original, description }) => `<li c
       alt="${description}"
     />
   </a>
-</li>`).join('')
-console.log(imagesEl);
+</li>`
+  )
+  .join("");
 
 galleryMenuEl.insertAdjacentHTML("beforeend", imagesEl);
 let instance = null;
 
 const onImageClick = (event) => {
-    event.preventDefault();  
-    if (event.target.nodeName !== "IMG") {
+  event.preventDefault();
+  if (event.target.nodeName !== "IMG") {
     return;
+  }
+  instance = basicLightbox.create(
+    `
+    <img src="${event.target.dataset.source}">`,
+    {
+      onShow: () => {
+        document.addEventListener("keydown", onCloseImg);
+      },
+      onClose: () => {
+        document.removeEventListener("keydown", onCloseImg);
+      },
     }
-    instance = basicLightbox.create(`
-    <img src="${event.target.dataset.source}">`)
-    instance.show(event.target)
+  );
+  instance.show(event.target);
+};
+
+function onCloseImg(event) {
+  if (event.code === "Escape") {
+    instance.close();
+  }
 }
 
-function onCloseImg (event){
-if(event.code === 'Escape'){
-  instance.close()
-}
-}
-
-galleryMenuEl.addEventListener('click', onImageClick)
-document.addEventListener('keydown', onCloseImg)
+galleryMenuEl.addEventListener("click", onImageClick);
